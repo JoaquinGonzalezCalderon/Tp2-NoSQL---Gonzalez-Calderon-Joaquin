@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mando-Rent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d, #6bcf7f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #b0b0b0;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            border-radius: 15px;
+            padding: 25px;
+            width: 280px;
+            border: 2px solid;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+        }
+
+        .card h3 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .estado-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .disponible {
+            border-color: #2ecc71;
+        }
+
+        .disponible .estado-badge {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+
+        .reservado {
+            border-color: #f1c40f;
+        }
+
+        .reservado .estado-badge {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+            border: 1px solid #f1c40f;
+        }
+
+        .alquilado {
+            border-color: #e74c3c;
+        }
+
+        .alquilado .estado-badge {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 12px 28px;
+            margin-top: 15px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            position: relative;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🎬 The Mandalorian</h1>
+    <p class="subtitle">Alquila episodios increíbles</p>
+    <div class="container">
+        {% for id, cap in capitulos.items() %}
+        <div class="card {{ cap.estado }}">
+            <h3>{{ cap.nombre }}</h3>
+            <div class="estado-badge">{{ cap.estado }}</div>
+
+            {% if cap.estado == 'disponible' %}
+            <button class="btn-reservar" data-id="{{ id }}">📌 Reservar ahora</button>
+            {% elif cap.estado == 'reservado' %}
+            <button class="btn-pagar" data-id="{{ id }}">💳 Confirmar Pago</button>
+            {% else %}
+            <button disabled>✓ Alquilado</button>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        const showNotification = (message, type = 'success') => {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 16px 24px;
+                background: ${type === 'success' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#e74c3c'};
+                color: white;
+                border-radius: 8px;
+                font-weight: 600;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        };
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        document.querySelectorAll('.btn-reservar').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                this.disabled = true;
+                this.textContent = '⏳ Procesando...';
+
+                fetch(`/alquilar/${id}`, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        showNotification(data.msg, 'success');
+                        setTimeout(() => location.reload(), 500);
+                    })
+                    .catch(err => {
+                        showNotification('Error: ' + err, 'error');
+                        this.disabled = false;
+                        this.textContent = '📌 Reservar ahora';
+                    });
+            });
+        });
+
+        document.querySelectorAll('.btn-pagar').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                this.disabled = true;
+                this.textContent = '⏳ Procesando pago...';
+
+                fetch('/confirmar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id, precio: 500 })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        showNotification(data.msg, 'success');
+                        setTimeout(() => location.reload(), 500);
+                    })
+                    .catch(err => {
+                        showNotification('Error: ' + err, 'error');
+                        this.disabled = false;
+                        this.textContent = '💳 Confirmar Pago';
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>
